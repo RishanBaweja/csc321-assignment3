@@ -25,7 +25,7 @@ pU = [e, n]
 pR = [d, n]
 
 M = randint(0, n)
-print("Plaintext:",p)
+print("Plaintext:",M)
 
 ciphertext = pow(M, e, n)
 print(f"Ciphertext: {ciphertext}")
