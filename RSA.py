@@ -17,8 +17,18 @@ e = 65537
 thetaN = (p-1) * (q-1)
 d = pow(e,-1,thetaN)
 
-res = ((d*e) % thetaN)
-print(f"theta N:{thetaN}\n\n")
-print(e)
-print(d)
-print(f"Result: {res}\n\n")
+#Sanity check
+check = ((d*e) % thetaN)
+print("Result:",check)
+
+pU = [e, n]
+pR = [d, n]
+
+M = randint(0, n)
+print("Plaintext:",p)
+
+ciphertext = pow(M, e, n)
+print(f"Ciphertext: {ciphertext}")
+
+plaintext = pow(ciphertext,d,n)
+print(f"Plaintext: {plaintext}")

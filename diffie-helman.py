@@ -69,12 +69,16 @@ a_data = bytes(map(xor, aMessage, iv))
 b_data= bytes(map(xor, bMessage, iv))
 
 # Cipher used with code in instructions
-aK_cipher = AES.new(aK, AES.MODE_ECB)
-bK_cipher = AES.new(bK, AES.MODE_ECB)
+aK_cipher = AES.new(aK, AES.MODE_CBC, iv)
+bK_cipher = AES.new(bK, AES.MODE_CBC, iv)
 
 # Encrypt the data and then return it
 alice_encrypted_data = aK_cipher.encrypt(pad(a_data,16))
 bob_encrypted_data = bK_cipher.encrypt(pad(b_data,16))
+
+#Regenerate cipher
+aK_cipher = AES.new(aK, AES.MODE_CBC, iv)
+bK_cipher = AES.new(bK, AES.MODE_CBC, iv)
 
 alice_decrypted = unpad(aK_cipher.decrypt(bob_encrypted_data), 16)
 bob_decrypted = unpad(bK_cipher.decrypt(alice_encrypted_data), 16)
