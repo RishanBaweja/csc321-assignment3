@@ -28,6 +28,20 @@ def Bob(q, xB, yA):
     # return the first 16 bytes
     return k[:16]
 
+def Mallory(initial_v, ciphertext):
+    s = 0
+    s_bytes = s.to_bytes((s.bit_length() + 7) // 8, byteorder='big')
+    #perform the SHA256 on it. After that digest it into bytes
+    k = SHA256.new(s_bytes).digest()[:16]
+    # return the first 16 bytes
+
+    new_cipher = AES.new(k, AES.MODE_ECB)
+    padded = new_cipher.decrypt(ciphertext)
+    decrypted = unpad(padded, 16)
+
+    plain = bytes(map(xor, decrypted, initial_v))
+    return plain
+
 #q, alpha = 37, 5
 
 q_hex = """
@@ -58,6 +72,8 @@ b = calculation(q, alpha) #(yA, yB)
 #aK = Alice(q, a[0], b[1]) #q, xA, yB
 #bK = Bob(q, b[0], a[1])   #q, xB, yA
 #aK = bK
+
+# Value for aK and bK are changed to q
 malKeyA = Alice(q, a[0], q)
 malKeyB = Bob(q, b[0], q) 
 #x^y mod x is 0
@@ -78,11 +94,18 @@ bK_cipher = AES.new(malKeyB, AES.MODE_ECB)
 alice_encrypted_data = aK_cipher.encrypt(pad(a_data,16))
 bob_encrypted_data = bK_cipher.encrypt(pad(b_data,16))
 
+mal_c0_decrypt = Mallory(iv, alice_encrypted_data)
+mal_c1_decrypt = Mallory(iv, bob_encrypted_data)
+
+print(f"The message that Mallory received from Alice: {mal_c0_decrypt}")
+print(f"The message that Mallory received from Bob: {mal_c1_decrypt}")
+
 alice_decrypted = unpad(aK_cipher.decrypt(bob_encrypted_data), 16)
 bob_decrypted = unpad(bK_cipher.decrypt(alice_encrypted_data), 16)
 
 alice_plain = bytes(map(xor, alice_decrypted, iv))
 bob_plain = bytes(map(xor, bob_decrypted, iv))
 
+print('')
 print(f"The message that Alice received from Bob: {alice_plain}")
 print(f"The message that Bob received from Alice: {bob_plain}")
