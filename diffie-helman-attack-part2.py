@@ -65,7 +65,7 @@ D662A4D1 8E73AFA3 2D779D59 18D08BC8 858F4DCE F97C2A24
 """.replace("\n","").replace(" ","")
 
 # alpha = int(alpha_hex, 16)
-alpha = 1
+alpha = q
 
 a = calculation(q, alpha) #(xA, xB)
 b = calculation(q, alpha) #(yA, yB)
@@ -95,11 +95,11 @@ bK_cipher = AES.new(bK, AES.MODE_ECB)
 alice_encrypted_data = aK_cipher.encrypt(pad(a_data,16))
 bob_encrypted_data = bK_cipher.encrypt(pad(b_data,16))
 
-# mal_c0_decrypt = Mallory(iv, alice_encrypted_data)
-# mal_c1_decrypt = Mallory(iv, bob_encrypted_data)
+mal_c0_decrypt = Mallory(iv, alice_encrypted_data)
+mal_c1_decrypt = Mallory(iv, bob_encrypted_data)
 
-# print(f"The message that Mallory received from Alice: {mal_c0_decrypt}")
-# print(f"The message that Mallory received from Bob: {mal_c1_decrypt}")
+print(f"The message that Mallory received from Alice: {mal_c0_decrypt}")
+print(f"The message that Mallory received from Bob: {mal_c1_decrypt}")
 
 alice_decrypted = unpad(aK_cipher.decrypt(bob_encrypted_data), 16)
 bob_decrypted = unpad(bK_cipher.decrypt(alice_encrypted_data), 16)
