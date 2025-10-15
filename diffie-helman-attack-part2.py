@@ -13,7 +13,7 @@ def calculation(q, alpha):
 
 def Alice(q, xA, yB):
     s = pow(yB,xA,q)
-    #convert s to bytes
+    # convert s to bytes
     s_bytes = s.to_bytes((s.bit_length() + 7) // 8, byteorder='big')
     #perform the SHA256 on it. After that digest it into bytes
     k = SHA256.new(s_bytes).digest() 
@@ -77,7 +77,7 @@ bK = Bob(q, b[0], a[1])   #q, xB, yA
 # Value for aK and bK are changed to q
 # malKeyA = Alice(q, a[0], q)
 # malKeyB = Bob(q, b[0], q) 
-#x^y mod x is 0
+# x^y mod x is 0
 iv = urandom(16)
 
 aMessage = b"Hi Bob"
