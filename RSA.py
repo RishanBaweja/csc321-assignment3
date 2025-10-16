@@ -1,7 +1,11 @@
 from Crypto.Util import number
+from Crypto.Hash import SHA256
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
 from random import randint
 from os import urandom
 from math import ceil, gcd
+from operator import xor
 
 # Want variable length
 randnum = randint(2,128)
@@ -24,29 +28,33 @@ pU = [e, n]
 pR = [d, n]
 
 M = randint(0, n)
-print("Plaintext:",M)
+print("bob_s_value_:",M)
 
 ciphertext = pow(M, e, n)
-print(f"Ciphertxt: {ciphertext}")
+print(f"public_key_s: {ciphertext}")
 
 plaintext = pow(ciphertext,d,n)
-print(f"Decrypted: {plaintext}")
+print(f"Decrypted_s_: {plaintext}")
 
 print('')
 
-while True:
-    s = randint(2, n-1)
-    if gcd(s, n) == 1:
-        break
+nd_modn = pow(n, d, n)
 
-# Mallory modifies ciphertext
-modified_c = (ciphertext * pow(s, e, n)) % n
+print(f"Message Mallory modifies: {nd_modn}")
 
-# Alice takes modified ciphertext and decrypts accordingly
-modified_m = pow(modified_c, d, n)
+# k = SHA256.new(M).digest()[:16]
+k = SHA256.new(nd_modn).digest()[:16]
+iv = urandom(16)
+mes = b'Hi Bob!'
 
-# Mallory recovers m by multiplying by s^-1
-inversed = pow(s, -1, n)
-mal_m = (modified_m * inversed) % n
+enc = bytes(map(xor, mes, iv))
 
-print(f"Message Mallory decodes: {mal_m}")
+new_cipher = AES.new(k, AES.MODE_CBC, iv)
+padded = new_cipher.encrypt(pad(enc, 16))
+
+new_cipher = AES.new(k, AES.MODE_CBC, iv)
+
+decrypted = unpad(new_cipher.decrypt(padded), 16)
+plain = bytes(map(xor, decrypted, iv))
+
+print(f"Received decrypted text: {plain}")
